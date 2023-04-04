@@ -10,6 +10,48 @@ import operator
 import pyspark.sql.functions as F
 
 
+def constructDiagnosticFeatureTuple(diagnostic):
+
+  diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
+  diag = diag.reduceByKey(lambda a, b: a + b)
+  return diag
+
+def constructMedicationFeatureTuple(medication):
+
+  med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
+  med = med.reduceByKey(lambda a, b: a + b)
+  return med
+
+def constructLabFeatureTuple(labResult):
+
+  lab_sum = labResult.map(lambda x: ((x.patientID, x.testName), x.value)).reduceByKey(lambda a, b: a + b)
+  lab_count = labResult.map(lambda x: ((x.patientID, x.testName), 1.0)).reduceByKey(lambda a, b: a + b)
+  lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
+  return lab
+
+def constructDiagnosticFeatureTuple(diagnostic, candidateCode):
+
+  diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
+  diag = diag.reduceByKey(lambda a, b: a + b)
+  diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
+  return diag_feature
+
+def constructMedicationFeatureTuple(medication, candidateMedication):
+
+  med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
+  med = med.reduceByKey(lambda a, b: a + b)
+  med_feature = med.filter(lambda x: x[0][1] in candidateMedication)
+  return med_feature
+
+def constructLabFeatureTuple(labResult, candidateLab):
+  
+  lab_sum = labResult.map(lambda x: ((x.patientID, x.testName), x.value)).reduceByKey(lambda a, b: a + b)
+  lab_count = labResult.map(lambda x: ((x.patientID, x.testName), 1.0)).reduceByKey(lambda a, b: a + b)
+  lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
+  lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
+  return lab_feature
+
+
 
 def svmlight_convert(normalized_data, identifier_map):
 
