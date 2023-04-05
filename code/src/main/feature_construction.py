@@ -29,8 +29,8 @@ def constructMedicationFeatureTuple(medication):
 
 def constructLabFeatureTuple(labResult):
 
-  lab_sum = labResult.map(lambda x: ((x.patientID, x.testName), x.value)).reduceByKey(lambda a, b: a + b)
-  lab_count = labResult.map(lambda x: ((x.patientID, x.testName), 1.0)).reduceByKey(lambda a, b: a + b)
+  lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
+  lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
   lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
   return lab
 
@@ -50,8 +50,8 @@ def constructMedicationFeatureTuple(medication, candidateMedication):
 
 def constructLabFeatureTuple(labResult, candidateLab):
   
-  lab_sum = labResult.map(lambda x: ((x.patientID, x.testName), x.value)).reduceByKey(lambda a, b: a + b)
-  lab_count = labResult.map(lambda x: ((x.patientID, x.testName), 1.0)).reduceByKey(lambda a, b: a + b)
+  lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
+  lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
   lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
   lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
   return lab_feature
