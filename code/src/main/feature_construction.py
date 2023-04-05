@@ -8,6 +8,11 @@ import os
 from pyspark.sql.window import Window
 import operator
 import pyspark.sql.functions as F
+from pyspark.ml.linalg import Vectors
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName('Read CSV File into DataFrame').getOrCreate()
+
+sc = spark.sparkContext
 
 
 def constructDiagnosticFeatureTuple(diagnostic):
@@ -51,31 +56,36 @@ def constructLabFeatureTuple(labResult, candidateLab):
   lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
   return lab_feature
 
+def construct(feature):
+  print(feature)
+  print(feature.collect())
 
+  feature_names = feature.map(lambda x: x[0][1]).distinct()
+  print(feature_names.collect())
+  feature_num = feature_names.count()
+  print(feature_num)
+  feat_idx_map = feature_names.zipWithIndex()
+  print(feat_idx_map.collect())
+  feat_table = feature.map(lambda x:(x[0][1], (x[0][0], x[1]))).join(feat_idx_map)
+  print(feat_table.collect())
 
-def svmlight_convert(normalized_data, identifier_map):
+  # [('DIAG4', (('19992', 1.0), 0)), ('DRUG7', (('19992', 0.9), 1))]                
+  idxed_features = feat_table.map(lambda x: (x[1][0][0],(x[1][1], x[1][0][1])))
+  print(idxed_features.collect())
+  grouped_features = idxed_features.groupByKey().mapValues(list)
+  print(grouped_features.collect())
+  # vectorized_grouped_features = grouped_features.map((lambda x: (x[0],[y[0] for y in x[1]], [y[1] for y in x[1]])))
+  # print(vectorized_grouped_features.collect())
 
-  features = normalized_data.join(identifier_map, ["eventid"], 'left_outer')
-  features = features.withColumn("V_tuple",concat_ws(":",features.event_index.cast(StringType()),format_number(features.normalized_feature_value,3)))
+  result = grouped_features.map(lambda x: (x[0], Vectors.sparse(feature_num, x[1])))
+  print(result.collect())
+  return result
+  
+featureTuple = ((str,str), float)
 
-  win = Window.partitionBy("patientid").orderBy("event_index")
+from pyspark import RDD
 
-  features = features.withColumn("sparse_feature", collect_list("V_tuple").over(win))
-
-  grouped_features = features.groupBy("patientid").agg(max_("sparse_feature").alias("sparse_feature"))
-
-  return grouped_features
-
-
-
-def svmlight_samples(grouped_features, diag_data):
-    
-    samples = grouped_features.join(diag_data["patientid", "label"], ["patientid"], 'left_outer')
-    samples = samples.na.fill(2,["label"]) # 0 for neg, 1 for pos, 2 for unknown
-
-    samples = samples.withColumn("sparse_feature_string", concat_ws(" ", samples.sparse_feature))
-
-    new_col_name =  "save_feature"
-    samples = samples.withColumn(new_col_name, concat_ws(" ", samples.label, samples.sparse_feature))
-	
-    return samples
+#Create RDD from parallelize    
+data = [(('19992', 'DIAG4'), 1.000),(('19992', 'DRUG7'), 0.900)]
+rdd=sc.parallelize(data)
+a = construct(rdd)
