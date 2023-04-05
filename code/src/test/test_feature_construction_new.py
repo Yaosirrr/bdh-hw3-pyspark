@@ -116,53 +116,53 @@ def test_filter_medication(spark):
 
 ####################################################################
 def test_aggregate_one_event_lab(spark):
-    data = [Medication("patient1", date.today(), "code1")]
+    data = [LabResult("patient1", date.today(), "code1", 42.0)]
     labs = spark.sparkContext.parallelize(data)
 
     actual = constructLabFeatureTuple(labs).collect()
-    expected = [(('patient1', 'code1'), 1.0)]
+    expected = [(('patient1', 'code1'), 42.0)]
     assert actual == expected
 
 def test_aggregate_two_different_events_lab(spark):
-    data = [Medication("patient1", date.today(), "code1"),
-            Medication("patient1", date.today(), "code2")]
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code2", 24.0)]
     labs = spark.sparkContext.parallelize(data)
 
     actual = constructLabFeatureTuple(labs).collect()
-    expected = [(('patient1', 'code1'), 1.0),
-                (('patient1', 'code2'), 1.0)]
+    expected = [(('patient1', 'code1'), 42.0),
+                (('patient1', 'code2'), 24.0)]
     assert actual == expected
 
 def test_aggregate_two_same_events_lab(spark):
-    data = [Medication("patient1", date.today(), "code1"),
-            Medication("patient1", date.today(), "code1")]
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code1", 24.0)]
     labs = spark.sparkContext.parallelize(data)
 
     actual = constructLabFeatureTuple(labs).collect()
-    expected = [(('patient1', 'code1'), 2.0)]
+    expected = [(('patient1', 'code1'), 66.0 / 2)]
     assert actual == expected
 
 def test_aggregate_three_events_with_duplication_lab(spark):
-    data = [Medication("patient1", date.today(), "code1"),
-            Medication("patient1", date.today(), "code1"),
-            Medication("patient1", date.today(), "code2")]
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code1", 24.0),
+            LabResult("patient1", date.today(), "code2", 7475.0)]
     labs = spark.sparkContext.parallelize(data)
 
     actual = constructLabFeatureTuple(labs).collect()
-    expected = [(('patient1', 'code1'), 2.0),
-                (('patient1', 'code2'), 1.0)]
+    expected = [(('patient1', 'code1'), 66.0 / 2),
+                (('patient1', 'code2'), 7475.0)]
     assert actual == expected
 
 def test_filter_lab(spark):
-    data = [Medication("patient1", date.today(), "code1"),
-            Medication("patient1", date.today(), "code1"),
-            Medication("patient1", date.today(), "code2")]
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code1", 24.0),
+            LabResult("patient1", date.today(), "code2", 7475.0)]
     labs = spark.sparkContext.parallelize(data)
 
     actual = constructLabFeatureTuple(labs, {"code2"}).collect()
-    expected = [(('patient1', 'code2'), 1.0)]
+    expected = [(('patient1', 'code2'), 7475.0)]
     assert actual == expected
 
     actual = constructLabFeatureTuple(labs, {"code1"}).collect()
-    expected = [(('patient1', 'code1'), 2.0)]
+    expected = [(('patient1', 'code1'), 66.0 / 2)]
     assert actual == expected
