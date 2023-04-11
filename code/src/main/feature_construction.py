@@ -10,6 +10,7 @@ import operator
 import pyspark.sql.functions as F
 from pyspark.ml.linalg import Vectors
 from pyspark.sql import SparkSession
+
 spark = SparkSession.builder.appName('Read CSV File into DataFrame').getOrCreate()
 
 sc = spark.sparkContext
