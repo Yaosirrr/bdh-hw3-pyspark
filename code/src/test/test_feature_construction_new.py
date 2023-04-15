@@ -1,13 +1,20 @@
-from src.main.models import Medication, LabResult, Diagnostic
+# # Dependencies
 from pyspark.sql import SparkSession
+from pyspark.ml.linalg import Vectors
+from pyspark import RDD
+
+from typing import Tuple
 from datetime import date
+import sys
+sys.path.append('./')
+
+for pat in sys.path:
+  print(pat)
+from src.main.models import Diagnostic, Medication, LabResult
 from src.main.feature_construction import *
-from datetime import date
 
 
-
-
-# spark = SparkSession.builder.appName('test').getOrCreate()
+spark = SparkSession.builder.appName('Feature Construction Test').getOrCreate()
 
 ####################################################################
 def test_aggregate_one_event_diagnostic(spark):
@@ -169,24 +176,36 @@ def test_filter_lab(spark):
     assert actual == expected
 
 
-def test_construct_unique_ids(spark_context):
-    patient_features = spark_context.parallelize([
-        (("patient1", "code2"), 42.0),
+def test_construct_unique_ids(spark):
+    patient_features = spark.sparkContext.parallelize([
+        (("patient1", "code2"), 49.0),
+        (("patient1", "code7"), 19.0),
         (("patient1", "code1"), 24.0)
     ])
-    actual = construct(spark_context, patient_features).collect()
-    expected = [("patient1", Vectors.dense([24.0, 42.0]))]
+    actual = construct(patient_features).collect()
+    expected = [('patient1', Vectors.sparse(3, [(0, 24.0), (1, 49.0), (2, 19.0)]))]
+    print(expected)
     assert actual == expected
 
-def test_construct_sparse_vectors(spark_context):
-    patient_features = spark_context.parallelize([
+def test_construct_sparse_vectors(spark):
+    patient_features = spark.sparkContext.parallelize([
         (("patient1", "code0"), 42.0),
         (("patient1", "code2"), 24.0),
         (("patient2", "code1"), 12.0)
     ])
-    actual = construct(spark_context, patient_features).collectAsMap()
+    actual = construct(patient_features).sortBy(lambda x: x[0]).collectAsMap()
+    print(actual)
+    # expected_dense = {
+    #     "patient1": Vectors.dense([42.0, 0.0, 24.0]),
+    #     "patient2": Vectors.dense([0.0, 12.0, 0.0])
+    # }
+    # print(expected_dense)
+
     expected = {
-        "patient1": Vectors.dense([42.0, 0.0, 24.0]),
-        "patient2": Vectors.dense([0.0, 12.0, 0.0])
+        "patient1": Vectors.sparse(3, [(0, 42.0), (2, 24.0)]),
+        "patient2": Vectors.sparse(3, [(1, 12.0)])
     }
+    print(expected)
     assert actual == expected
+test_construct_unique_ids(spark)
+test_construct_sparse_vectors(spark)

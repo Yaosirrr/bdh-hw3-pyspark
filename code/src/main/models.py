@@ -11,7 +11,7 @@ class LabResult:
         self.resultName = resultName
         self.value = value
 
-class Diagnostic:
+class Diagnostic():
     def __init__(self, patientID, code, date):
         self.patientID = patientID
         self.date = date

@@ -4,7 +4,7 @@ from Metrics import getPurity
 from math import isclose
 
 
-# spark = SparkSession.builder.appName("TestMetrics").getOrCreate()
+spark = SparkSession.builder.appName("TestMetrics").getOrCreate()
 
 
 def test_get_purity(self):
