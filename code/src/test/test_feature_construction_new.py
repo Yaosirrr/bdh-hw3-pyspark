@@ -2,6 +2,7 @@ from src.main.models import Medication, LabResult, Diagnostic
 from pyspark.sql import SparkSession
 from datetime import date
 from src.main.feature_construction import *
+from datetime import date
 
 
 

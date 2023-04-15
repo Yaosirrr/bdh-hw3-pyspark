@@ -11,10 +11,16 @@ import pyspark.sql.functions as F
 from pyspark.ml.linalg import Vectors
 from pyspark.sql import SparkSession
 from pyspark import RDD
+import sys
+sys.path.append('../')
+
+for pat in sys.path:
+  print(pat)
 from models import Diagnostic, Medication, LabResult
 from typing import Tuple
+from datetime import date
 
-spark = SparkSession.builder.appName('Read CSV File into DataFrame').getOrCreate()
+spark = SparkSession.builder.appName('Construct Features').getOrCreate()
 
 sc = spark.sparkContext
 
@@ -39,27 +45,27 @@ def constructLabFeatureTuple(labResult):
   lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
   return lab
 
-def constructDiagnosticFeatureTuple(diagnostic, candidateCode):
+# def constructDiagnosticFeatureTuple(diagnostic, candidateCode):
 
-  diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
-  diag = diag.reduceByKey(lambda a, b: a + b)
-  diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
-  return diag_feature
+#   diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
+#   diag = diag.reduceByKey(lambda a, b: a + b)
+#   diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
+#   return diag_feature
 
-def constructMedicationFeatureTuple(medication, candidateMedication):
+# def constructMedicationFeatureTuple(medication, candidateMedication):
 
-  med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
-  med = med.reduceByKey(lambda a, b: a + b)
-  med_feature = med.filter(lambda x: x[0][1] in candidateMedication)
-  return med_feature
+#   med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
+#   med = med.reduceByKey(lambda a, b: a + b)
+#   med_feature = med.filter(lambda x: x[0][1] in candidateMedication)
+#   return med_feature
 
-def constructLabFeatureTuple(labResult, candidateLab):
+# def constructLabFeatureTuple(labResult, candidateLab):
   
-  lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
-  lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
-  lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
-  lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
-  return lab_feature
+#   lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
+#   lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
+#   lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
+#   lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
+#   return lab_feature
 
 def construct(feature):
   print(feature)
@@ -88,9 +94,14 @@ def construct(feature):
   
 featureTuple = ((str,str), float)
 
-from pyspark import RDD
+data = [Medication("patient1", date.today(), "code1"),
+        Medication("patient1", date.today(), "code2")]
+meds = spark.sparkContext.parallelize(data)
+
+rdd = constructMedicationFeatureTuple(meds)
+
 
 #Create RDD from parallelize    
-data = [(('19992', 'DIAG4'), 1.000),(('19992', 'DRUG7'), 0.900)]
-rdd=sc.parallelize(data)
+# data = [(('19992', 'DIAG4'), 1.000),(('19992', 'DRUG7'), 0.900)]
+# rdd=sc.parallelize(data)
 a = construct(rdd)
