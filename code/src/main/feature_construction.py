@@ -10,13 +10,17 @@ import operator
 import pyspark.sql.functions as F
 from pyspark.ml.linalg import Vectors
 from pyspark.sql import SparkSession
+from pyspark import RDD
+from models import Diagnostic, Medication, LabResult
+from typing import Tuple
 
 spark = SparkSession.builder.appName('Read CSV File into DataFrame').getOrCreate()
 
 sc = spark.sparkContext
 
+FeatureTuple = Tuple[Tuple[str, str], float]
 
-def constructDiagnosticFeatureTuple(diagnostic):
+def constructDiagnosticFeatureTuple(diagnostic: RDD[Diagnostic]) -> RDD[FeatureTuple]:
 
   diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
   diag = diag.reduceByKey(lambda a, b: a + b)
