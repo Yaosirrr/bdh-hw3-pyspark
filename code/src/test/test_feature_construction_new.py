@@ -166,3 +166,26 @@ def test_filter_lab(spark):
     actual = constructLabFeatureTuple(labs, {"code1"}).collect()
     expected = [(('patient1', 'code1'), 66.0 / 2)]
     assert actual == expected
+
+
+def test_construct_unique_ids(spark_context):
+    patient_features = spark_context.parallelize([
+        (("patient1", "code2"), 42.0),
+        (("patient1", "code1"), 24.0)
+    ])
+    actual = construct(spark_context, patient_features).collect()
+    expected = [("patient1", Vectors.dense([24.0, 42.0]))]
+    assert actual == expected
+
+def test_construct_sparse_vectors(spark_context):
+    patient_features = spark_context.parallelize([
+        (("patient1", "code0"), 42.0),
+        (("patient1", "code2"), 24.0),
+        (("patient2", "code1"), 12.0)
+    ])
+    actual = construct(spark_context, patient_features).collectAsMap()
+    expected = {
+        "patient1": Vectors.dense([42.0, 0.0, 24.0]),
+        "patient2": Vectors.dense([0.0, 12.0, 0.0])
+    }
+    assert actual == expected
