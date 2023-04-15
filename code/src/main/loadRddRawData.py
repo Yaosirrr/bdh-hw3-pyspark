@@ -6,7 +6,7 @@ from pyspark.sql.functions import col
 from datetime import datetime
 from pyspark.sql.types import StringType, BooleanType, IntegerType, DoubleType
 #import main.models as models
-from models import Medication , LabResult ,Diagnostic
+from src.main.models import Medication , LabResult ,Diagnostic
 
 # Define the case classes
 # this is in the model part in original files
@@ -30,7 +30,15 @@ def load_rdd_raw_data(spark):
 #     medication_schema = spark.createDataFrame([], Medication()).schema
     
     # Load the CSV files and create the corresponding tables
-    csv_files = ["../../data/encounter_INPUT.csv", "../../data/encounter_dx_INPUT.csv", "../../data/lab_results_INPUT.csv", "../../data/medication_orders_INPUT.csv"]
+    # csv_files = ["../../data/encounter_INPUT.csv", "../../data/encounter_dx_INPUT.csv", "../../data/lab_results_INPUT.csv", "../../data/medication_orders_INPUT.csv"]
+    relative_path = "./data/"
+    file_name = ["encounter_INPUT.csv",\
+                "encounter_dx_INPUT.csv", \
+                "lab_results_INPUT.csv", \
+                 "medication_orders_INPUT.csv"]
+    
+    csv_files = [relative_path+x for x in file_name]
+
     for file in csv_files:
         df = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load(file)
         table_name = file.split("/")[-1].split(".")[0]
