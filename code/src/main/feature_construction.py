@@ -2,8 +2,10 @@
 from pyspark.sql import SparkSession
 from pyspark.ml.linalg import Vectors
 from pyspark import RDD
+from multipledispatch import dispatch
 
 from typing import Tuple
+from typing import Set
 from datetime import date
 import sys
 sys.path.append('./')
@@ -13,22 +15,25 @@ from src.main.loadRddRawData import *
 
 FeatureTuple = Tuple[Tuple[str, str], float]
 
+# @dispatch(RDD[Diagnostic])
 def constructDiagnosticFeatureTuple(diagnostic: RDD[Diagnostic]) -> RDD[FeatureTuple]:
 
     diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
     diag = diag.reduceByKey(lambda a, b: a + b)
     return diag
 
+# @dispatch(RDD[Medication])
 def constructMedicationFeatureTuple(medication: RDD[Medication]) -> RDD[FeatureTuple]:
 
     med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
     med = med.reduceByKey(lambda a, b: a + b)
     return med
 
+# @dispatch(RDD[LabResult])
 def constructLabFeatureTuple(labResult: RDD[LabResult]) -> RDD[FeatureTuple] :
 
-    lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
-    lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
+    lab_sum = labResult.map(lambda x: ((x.patientID, x.resultName), x.value)).reduceByKey(lambda a, b: a + b)
+    lab_count = labResult.map(lambda x: ((x.patientID, x.resultName), 1.0)).reduceByKey(lambda a, b: a + b)
     lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
     return lab
 
@@ -48,27 +53,30 @@ def constructDiagnosticFeatureTuple(diagnostic, candidateCode=None):
 
 then, you can only use three functions, instead of six
 '''
-def constructDiagnosticFeatureTuple(diagnostic, candidateCode):
+# @dispatch(RDD[Diagnostic], Set)
+# def constructDiagnosticFeatureTuple(diagnostic, candidateCode):
 
-    diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
-    diag = diag.reduceByKey(lambda a, b: a + b)
-    diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
-    return diag_feature
+#     diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
+#     diag = diag.reduceByKey(lambda a, b: a + b)
+#     diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
+#     return diag_feature
 
-def constructMedicationFeatureTuple(medication, candidateMedication):
+# @dispatch(RDD[Medication], Set)
+# def constructMedicationFeatureTuple(medication, candidateMedication):
 
-    med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
-    med = med.reduceByKey(lambda a, b: a + b)
-    med_feature = med.filter(lambda x: x[0][1] in candidateMedication)
-    return med_feature
+#     med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
+#     med = med.reduceByKey(lambda a, b: a + b)
+#     med_feature = med.filter(lambda x: x[0][1] in candidateMedication)
+#     return med_feature
 
-def constructLabFeatureTuple(labResult, candidateLab):
+# @dispatch(RDD[LabResult], Set)
+# def constructLabFeatureTuple(labResult, candidateLab):
   
-    lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
-    lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
-    lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
-    lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
-    return lab_feature
+#     lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
+#     lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
+#     lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
+#     lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
+#     return lab_feature
 
 def construct(feature):
     feature_names = feature.map(lambda x: x[0][1]).distinct().sortBy(lambda x: x)
@@ -93,14 +101,19 @@ if __name__ == '__main__':
     medication_rdd, lab_result_rdd, diagnostic_rdd = load_rdd_raw_data(spark)
     # medication_rdd = spark.sparkContext.parallelize(medication_rdd.collect())
     # print(medication_rdd.count())
-    # print(lab_result_rdd.count())
+    print(lab_result_rdd.count())
     # print(diagnostic_rdd.count())
     # print(type(medication_rdd))
     
-    diagnostic_feature_tuples = constructDiagnosticFeatureTuple(lab_result_rdd)
-    medicine_feature_tuples = constructMedicationFeatureTuple(medication_rdd)
-    lab_result_feature_tuples  = constructLabFeatureTuple(diagnostic_rdd)
+    diagnostic_feature_tuples = constructDiagnosticFeatureTuple(diagnostic_rdd)
+    print(diagnostic_feature_tuples.count())
     
+    medicine_feature_tuples = constructMedicationFeatureTuple(medication_rdd)
+    print(medicine_feature_tuples.count())
+
+    lab_result_feature_tuples  = constructLabFeatureTuple(lab_result_rdd)
+    print(lab_result_feature_tuples.count())
+
     
     data = [Medication("patient1", date.today(), "code1"),
         Medication("patient1", date.today(), "code2")]
