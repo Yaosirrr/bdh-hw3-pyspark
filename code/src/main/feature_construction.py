@@ -2,7 +2,6 @@
 from pyspark.sql import SparkSession
 from pyspark.ml.linalg import Vectors
 from pyspark import RDD
-from multipledispatch import dispatch
 
 from typing import Tuple
 from typing import Set
@@ -15,68 +14,44 @@ from src.main.loadRddRawData import *
 
 FeatureTuple = Tuple[Tuple[str, str], float]
 
-# @dispatch(RDD[Diagnostic])
-def constructDiagnosticFeatureTuple(diagnostic: RDD[Diagnostic]) -> RDD[FeatureTuple]:
+def constructDiagnosticFeatureTuple(diagnostic: RDD[Diagnostic], candidateCode: Set = None) -> RDD[FeatureTuple]:
+    if candidateCode is None:
+        diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
+        diag = diag.reduceByKey(lambda a, b: a + b)
 
-    diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
-    diag = diag.reduceByKey(lambda a, b: a + b)
+    else:
+        diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
+        diag = diag.reduceByKey(lambda a, b: a + b)
+        diag = diag.filter(lambda x: x[0][1] in candidateCode)
+
     return diag
 
-# @dispatch(RDD[Medication])
-def constructMedicationFeatureTuple(medication: RDD[Medication]) -> RDD[FeatureTuple]:
+def constructMedicationFeatureTuple(medication: RDD[Medication], candidateMedication: Set = None) -> RDD[FeatureTuple]:
+    if candidateMedication is None:
+        med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
+        med = med.reduceByKey(lambda a, b: a + b)
+    
+    else:
+        med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
+        med = med.reduceByKey(lambda a, b: a + b)
+        med = med.filter(lambda x: x[0][1] in candidateMedication)
 
-    med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
-    med = med.reduceByKey(lambda a, b: a + b)
     return med
 
-# @dispatch(RDD[LabResult])
-def constructLabFeatureTuple(labResult: RDD[LabResult]) -> RDD[FeatureTuple] :
+def constructLabFeatureTuple(labResult: RDD[LabResult], candidateLab: Set = None) -> RDD[FeatureTuple] :
+    if candidateLab is None:
+        lab_sum = labResult.map(lambda x: ((x.patientID, x.resultName), x.value)).reduceByKey(lambda a, b: a + b)
+        lab_count = labResult.map(lambda x: ((x.patientID, x.resultName), 1.0)).reduceByKey(lambda a, b: a + b)
+        lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
+    
+    else:
+        lab_sum = labResult.map(lambda x: ((x.patientID, x.resultName), x.value)).reduceByKey(lambda a, b: a + b)
+        lab_count = labResult.map(lambda x: ((x.patientID, x.resultName), 1.0)).reduceByKey(lambda a, b: a + b)
+        lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
+        lab = lab.filter(lambda x: x[0][1] in candidateLab)
 
-    lab_sum = labResult.map(lambda x: ((x.patientID, x.resultName), x.value)).reduceByKey(lambda a, b: a + b)
-    lab_count = labResult.map(lambda x: ((x.patientID, x.resultName), 1.0)).reduceByKey(lambda a, b: a + b)
-    lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
     return lab
 
-'''
-Functions below need to be renamed. Otherwise, they will override
-same-named functions above since Python is fully override.
-
-If you want to use the same function name, set 'candidateCode' as optional input
-or simply modify function logic as:
-
-def constructDiagnosticFeatureTuple(diagnostic, candidateCode=None):
-    diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
-    diag = diag.reduceByKey(lambda a, b: a + b)
-    if candidateCode is not None:
-      diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
-    return diag_feature
-
-then, you can only use three functions, instead of six
-'''
-# @dispatch(RDD[Diagnostic], Set)
-# def constructDiagnosticFeatureTuple(diagnostic, candidateCode):
-
-#     diag = diagnostic.map(lambda x:((x.patientID, x.code), 1.0))
-#     diag = diag.reduceByKey(lambda a, b: a + b)
-#     diag_feature = diag.filter(lambda x: x[0][1] in candidateCode)
-#     return diag_feature
-
-# @dispatch(RDD[Medication], Set)
-# def constructMedicationFeatureTuple(medication, candidateMedication):
-
-#     med = medication.map(lambda x:((x.patientID, x.medicine), 1.0))
-#     med = med.reduceByKey(lambda a, b: a + b)
-#     med_feature = med.filter(lambda x: x[0][1] in candidateMedication)
-#     return med_feature
-
-# @dispatch(RDD[LabResult], Set)
-# def constructLabFeatureTuple(labResult, candidateLab):
-  
-#     lab_sum = labResult.map(lambda x: ((x.patientID, x.reslultName), x.value)).reduceByKey(lambda a, b: a + b)
-#     lab_count = labResult.map(lambda x: ((x.patientID, x.reslultName), 1.0)).reduceByKey(lambda a, b: a + b)
-#     lab = lab_sum.join(lab_count).map(lambda x: (x[0], x[1][0] / x[1][1]))
-#     lab_feature = lab.filter(lambda x: x[0][1] in candidateLab)
-#     return lab_feature
 
 def construct(feature):
     feature_names = feature.map(lambda x: x[0][1]).distinct().sortBy(lambda x: x)
