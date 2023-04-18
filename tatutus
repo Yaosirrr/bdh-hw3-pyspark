@@ -1,0 +1,203 @@
+[33mcommit 2ff2a6ade866169bc836e69213f90626338c65a7[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;32mdev[m[33m)[m
+Author: Quan Guo <qguo48@gatech.edu>
+Date:   Sat Apr 15 11:53:46 2023 -0400
+
+    fix import based on code folder, complete individual test without wrapper
+
+[33mcommit 1cf359f8a34da4f48fbca9dab8134a5fb086a735[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 4e244d6 ac48723
+Author: George <quanguo@gatech.edu>
+Date:   Fri Apr 14 22:34:17 2023 -0400
+
+    fix the import of models, unfinished
+
+[33mcommit 4e244d609910e5ab4106c4236ab24bb453e938cc[m
+Author: George <quanguo@gatech.edu>
+Date:   Fri Apr 14 22:30:09 2023 -0400
+
+    modify the import of models, unfinished
+
+[33mcommit ac48723bbf5a2ea261fbf0dd55f2936d59404387[m
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Fri Apr 14 22:04:51 2023 -0400
+
+    Add 2 feature construction tests
+
+[33mcommit 69d6478c883fcc87877e007a363efd866177b837[m
+Merge: 65ec08f 6bce82c
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Fri Apr 14 21:48:36 2023 -0400
+
+    Merge branch 'main' of https://github.com/Yaosirrr/bdh-hw3-pyspark
+
+[33mcommit 65ec08fdee413b7934292b88f6dc5203ab7d8e32[m
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Fri Apr 14 21:47:39 2023 -0400
+
+    Add test_clustering
+
+[33mcommit 6bce82cae84383f262769bdeb601e46c00c0bf91[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Fri Apr 14 18:40:28 2023 -0400
+
+    add data type and return type to the function
+
+[33mcommit 2f7732be71c597b6fb83268fd8578517f86c63b1[m
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Fri Apr 14 17:30:35 2023 -0400
+
+    Add test_metric
+
+[33mcommit 450c81a466c5332cb1681e053bff8d164de9ffac[m
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Fri Apr 14 17:29:30 2023 -0400
+
+    Add test_metric
+
+[33mcommit 0c6dad7d25ade700835c47d437654a11ccd45ea0[m
+Merge: f3c2721 b68eca4
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Fri Apr 14 17:26:31 2023 -0400
+
+    Merge branch 'main' of https://github.com/Yaosirrr/bdh-hw3-pyspark
+
+[33mcommit b68eca43396984219f8c6d20441cb9b9520cabf1[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 12 18:46:38 2023 -0400
+
+    Add files via upload
+
+[33mcommit 007bbf8d06157febe20057f4335ed2c056628167[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 12 18:46:23 2023 -0400
+
+    Delete loadRddRawData.py
+
+[33mcommit a59a16e803338ef3d36ef02e8f93c0fa2c4467df[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 12 18:44:58 2023 -0400
+
+    Add files via upload
+
+[33mcommit 58c3acd876239b0c0eaf7068f0603abb04fbfe57[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 12 18:44:40 2023 -0400
+
+    Add files via upload
+
+[33mcommit a927b26b18cd3794b7c93340a9c4848402379acf[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 12 18:44:08 2023 -0400
+
+    Add files via upload
+
+[33mcommit f3c272145ed8e58a19b4daa2e4d77ef118a0399c[m
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Tue Apr 11 18:06:55 2023 -0400
+
+    test for metric
+
+[33mcommit fc57a891e22b81086a4240113e4a8d81285d5bc2[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Wed Apr 5 11:11:15 2023 -0400
+
+    modify feature construction
+
+[33mcommit ab22b28a1bb5e4af101388d60b3d29962870e2a9[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 5 09:46:29 2023 -0400
+
+    Add files via upload
+
+[33mcommit 6c764faa000043083180a1028ad2bee3590a928f[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Wed Apr 5 09:45:37 2023 -0400
+
+    Add files via upload
+    
+    Metrics
+
+[33mcommit eee61c7472089df88a820493e7098dfcb6b73fbd[m
+Author: Yaosirrr <44641995+Yaosirrr@users.noreply.github.com>
+Date:   Tue Apr 4 23:03:46 2023 -0400
+
+    Update README.md
+
+[33mcommit 60b75178340240a3bd38a69757ee57dd5f07c882[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Tue Apr 4 23:01:47 2023 -0400
+
+    update feature test
+
+[33mcommit fdb1442c93b9666da1df6247dc89e0a2539dd037[m
+Merge: dc4d87c f2104c9
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Tue Apr 4 22:49:46 2023 -0400
+
+    Merge branch 'main' of https://github.com/Yaosirrr/bdh-hw3-pyspark
+
+[33mcommit dc4d87c08593474a09ea37f91a48c6c30ba65258[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Tue Apr 4 22:47:53 2023 -0400
+
+    add test for feature construction
+
+[33mcommit f2104c97d1e447b77725286b693ce4fe330ce021[m
+Author: George <quanguo@gatech.edu>
+Date:   Tue Apr 4 22:41:27 2023 -0400
+
+    fixed feature construction
+
+[33mcommit b87f384d466ef83019cb294ce957d5de0cbbd501[m
+Author: Liuyuzheng <103473027+Liuyuzheng@users.noreply.github.com>
+Date:   Tue Apr 4 21:44:26 2023 -0400
+
+    Add files via upload
+
+[33mcommit e5d57d0e9ccbff5317bab6ea684f8c862510e7d6[m
+Author: Guo <qguo48@gatech.edu>
+Date:   Tue Apr 4 20:38:19 2023 -0400
+
+    change construct function
+
+[33mcommit 8da1107db9b93f1c5753432c0b0781af8dd8e6cd[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Tue Apr 4 20:19:41 2023 -0400
+
+    add models.py
+
+[33mcommit 408d5046ea35bbc8f6ae601194b7b49661a71a0d[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Tue Apr 4 19:45:27 2023 -0400
+
+    add construct feature functions
+
+[33mcommit 28de3cc4d45f1a993143bdcead13c6a902103dda[m
+Author: jzhao0626 <walt980626@gmail.com>
+Date:   Tue Apr 4 16:29:08 2023 -0400
+
+    Return Sparse Vector
+
+[33mcommit 02788168be0dfacd67bba7c8667e13d29ff6034d[m
+Author: Guo <qguo48@gatech.edu>
+Date:   Mon Apr 3 19:56:29 2023 -0400
+
+    slightly modify README for test commit
+
+[33mcommit d6ea4d424d72ad919d83740d6c34e29ffc8086e2[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Sun Apr 2 19:20:42 2023 -0400
+
+    add data
+
+[33mcommit c691b6e0329bd87ee00331da3e757e21b7df8d10[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Sun Apr 2 19:18:24 2023 -0400
+
+    initialization
+
+[33mcommit 1e9d071291ee9e822893b6cb2b564327b8c9217e[m
+Author: Yaosirrr <yrj0398@gmail.com>
+Date:   Sun Apr 2 19:09:40 2023 -0400
+
+    add readme

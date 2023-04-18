@@ -5,8 +5,9 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 from datetime import datetime
 from pyspark.sql.types import StringType, BooleanType, IntegerType, DoubleType
-#import main.models as models
-from src.main.models import Medication , LabResult ,Diagnostic
+import sys
+sys.path.append('./')
+from src.main.models import Diagnostic, Medication, LabResult
 
 # Define the case classes
 # this is in the model part in original files

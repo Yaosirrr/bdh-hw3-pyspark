@@ -8,7 +8,6 @@ from typing import Set
 from datetime import date
 import sys
 sys.path.append('./')
-
 from src.main.models import Diagnostic, Medication, LabResult
 from src.main.loadRddRawData import *
 

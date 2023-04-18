@@ -3,8 +3,10 @@ from pyspark.rdd import RDD
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
 from typing import Tuple
-from models import Medication , LabResult ,Diagnostic
-from loadRddRawData import load_rdd_raw_data
+import sys
+sys.path.append('./')
+from src.main.models import Diagnostic, Medication, LabResult
+from src.main.loadRddRawData import load_rdd_raw_data
 from pyspark.sql.functions import lower 
 
 #class T2dmPhenotype:
