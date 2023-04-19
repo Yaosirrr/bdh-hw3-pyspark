@@ -84,3 +84,69 @@ def test_sparse_vectors():
     #         res = False
     #         break
     eq_(res, True, "feature type (Vectors.sparse) or values (vector length or values) are incorrect")
+
+
+####################################################################
+@nottest
+def setup_diags_one(spark):
+    global diags
+    data = [Diagnostic("patient1", "code1", date.today())]
+    diags = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_diags_one(spark))
+def test_aggregate_one_event_diagnostic():
+    actual = constructDiagnosticFeatureTuple(diags).collect()
+    expected = [(('patient1', 'code1'), 1.0)]
+    assert actual == expected
+
+@nottest
+def setup_diags_two_different(spark):
+    global diags
+    data = [Diagnostic("patient1", "code1", date.today()),
+            Diagnostic("patient1", "code2", date.today())]
+    diags = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_diags_two_different(spark))
+def test_aggregate_two_different_events_diagnostic():
+    actual = constructDiagnosticFeatureTuple(diags).collect()
+    expected = [(('patient1', 'code1'), 1.0),
+                (('patient1', 'code2'), 1.0)]
+    assert actual == expected
+
+@nottest
+def setup_diags_two_same(spark):
+    global diags
+    data = [Diagnostic("patient1", "code1", date.today()),
+            Diagnostic("patient1", "code1", date.today())]
+    diags = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_diags_two_same(spark))
+def test_aggregate_two_same_events_diagnostic():
+    actual = constructDiagnosticFeatureTuple(diags).collect()
+    expected = [(('patient1', 'code1'), 2.0)]
+    assert actual == expected
+
+@nottest
+def setup_diags_three(spark):
+    global diags
+    data = [Diagnostic("patient1", "code1", date.today()),
+            Diagnostic("patient1", "code1", date.today()),
+            Diagnostic("patient1", "code2", date.today())]
+    diags = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_diags_three(spark))
+def test_aggregate_three_events_with_duplication_diagnostic():
+    actual = constructDiagnosticFeatureTuple(diags).collect()
+    expected = [(('patient1', 'code1'), 2.0),
+                (('patient1', 'code2'), 1.0)]
+    assert actual == expected
+
+@with_setup(setup_diags_three(spark))
+def test_filter_diagnostic():
+    actual = constructDiagnosticFeatureTuple(diags, {"code2"}).collect()
+    expected = [(('patient1', 'code2'), 1.0)]
+    assert actual == expected
+
+    actual = constructDiagnosticFeatureTuple(diags, {"code1"}).collect()
+    expected = [(('patient1', 'code1'), 2.0)]
+    assert actual == expected
