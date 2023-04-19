@@ -150,3 +150,68 @@ def test_filter_diagnostic():
     actual = constructDiagnosticFeatureTuple(diags, {"code1"}).collect()
     expected = [(('patient1', 'code1'), 2.0)]
     assert actual == expected
+
+####################################################################
+@nottest
+def setup_meds_one(spark):
+    global meds
+    data = [Medication("patient1", date.today(), "code1")]
+    meds = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_meds_one(spark))
+def test_aggregate_one_event_medication():
+    actual = constructMedicationFeatureTuple(meds).collect()
+    expected = [(('patient1', 'code1'), 1.0)]
+    assert actual == expected
+
+@nottest
+def setup_meds_two_diff(spark):
+    global meds
+    data = [Medication("patient1", date.today(), "code1"),
+            Medication("patient1", date.today(), "code2")]
+    meds = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_meds_two_diff(spark))
+def test_aggregate_two_different_events_medication():
+    actual = constructMedicationFeatureTuple(meds).collect()
+    expected = [(('patient1', 'code1'), 1.0),
+                (('patient1', 'code2'), 1.0)]
+    assert actual == expected
+
+@nottest
+def setup_meds_two_same(spark):
+    global meds
+    data = [Medication("patient1", date.today(), "code1"),
+            Medication("patient1", date.today(), "code1")]
+    meds = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_meds_two_same())
+def test_aggregate_two_same_events_medication():
+    actual = constructMedicationFeatureTuple(meds).collect()
+    expected = [(('patient1', 'code1'), 2.0)]
+    assert actual == expected
+
+@nottest
+def setup_meds_three(spark):
+    global meds
+    data = [Medication("patient1", date.today(), "code1"),
+            Medication("patient1", date.today(), "code1"),
+            Medication("patient1", date.today(), "code2")]
+    meds = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_meds_three())
+def test_aggregate_three_events_with_duplication_medication():
+    actual = constructMedicationFeatureTuple(meds).collect()
+    expected = [(('patient1', 'code1'), 2.0),
+                (('patient1', 'code2'), 1.0)]
+    assert actual == expected
+
+@with_setup(setup_meds_three())
+def test_filter_medication():
+    actual = constructMedicationFeatureTuple(meds, {"code2"}).collect()
+    expected = [(('patient1', 'code2'), 1.0)]
+    assert actual == expected
+
+    actual = constructMedicationFeatureTuple(meds, {"code1"}).collect()
+    expected = [(('patient1', 'code1'), 2.0)]
+    assert actual == expected
