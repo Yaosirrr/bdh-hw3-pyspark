@@ -185,7 +185,7 @@ def setup_meds_two_same(spark):
             Medication("patient1", date.today(), "code1")]
     meds = spark.sparkContext.parallelize(data)
 
-@with_setup(setup_meds_two_same())
+@with_setup(setup_meds_two_same(spark))
 def test_aggregate_two_same_events_medication():
     actual = constructMedicationFeatureTuple(meds).collect()
     expected = [(('patient1', 'code1'), 2.0)]
@@ -199,14 +199,14 @@ def setup_meds_three(spark):
             Medication("patient1", date.today(), "code2")]
     meds = spark.sparkContext.parallelize(data)
 
-@with_setup(setup_meds_three())
+@with_setup(setup_meds_three(spark))
 def test_aggregate_three_events_with_duplication_medication():
     actual = constructMedicationFeatureTuple(meds).collect()
     expected = [(('patient1', 'code1'), 2.0),
                 (('patient1', 'code2'), 1.0)]
     assert actual == expected
 
-@with_setup(setup_meds_three())
+@with_setup(setup_meds_three(spark))
 def test_filter_medication():
     actual = constructMedicationFeatureTuple(meds, {"code2"}).collect()
     expected = [(('patient1', 'code2'), 1.0)]
@@ -214,4 +214,74 @@ def test_filter_medication():
 
     actual = constructMedicationFeatureTuple(meds, {"code1"}).collect()
     expected = [(('patient1', 'code1'), 2.0)]
+    assert actual == expected
+
+####################################################################
+@nottest
+def setup_labs_one(spark):
+    global labs
+    data = [LabResult("patient1", date.today(), "code1", 42.0)]
+    labs = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_labs_one(spark))
+def test_aggregate_one_event_lab():
+    actual = constructLabFeatureTuple(labs).collect()
+    expected = [(('patient1', 'code1'), 42.0)]
+    assert actual == expected
+
+@nottest
+def setup_labs_two_diff(spark):
+    global labs
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code2", 24.0)]
+    labs = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_labs_two_diff(spark))
+def test_aggregate_two_different_events_lab():
+    actual = constructLabFeatureTuple(labs).collect()
+    expected = [(('patient1', 'code1'), 42.0),
+                (('patient1', 'code2'), 24.0)]
+    assert actual == expected
+
+@nottest
+def setup_labs_two_same(spark):
+    global labs
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code1", 24.0)]
+    labs = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_labs_two_same(spark))
+def test_aggregate_two_same_events_lab():
+    actual = constructLabFeatureTuple(labs).collect()
+    expected = [(('patient1', 'code1'), 66.0 / 2)]
+    assert actual == expected
+
+@nottest
+def setup_labs_three(spark):
+    global labs
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code1", 24.0),
+            LabResult("patient1", date.today(), "code2", 7475.0)]
+    labs = spark.sparkContext.parallelize(data)
+
+@with_setup(setup_labs_three(spark))
+def test_aggregate_three_events_with_duplication_lab():
+    actual = constructLabFeatureTuple(labs).collect()
+    expected = [(('patient1', 'code1'), 66.0 / 2),
+                (('patient1', 'code2'), 7475.0)]
+    assert actual == expected
+
+@with_setup(setup_labs_three(spark))
+def test_filter_lab(spark):
+    data = [LabResult("patient1", date.today(), "code1", 42.0),
+            LabResult("patient1", date.today(), "code1", 24.0),
+            LabResult("patient1", date.today(), "code2", 7475.0)]
+    labs = spark.sparkContext.parallelize(data)
+
+    actual = constructLabFeatureTuple(labs, {"code2"}).collect()
+    expected = [(('patient1', 'code2'), 7475.0)]
+    assert actual == expected
+
+    actual = constructLabFeatureTuple(labs, {"code1"}).collect()
+    expected = [(('patient1', 'code1'), 66.0 / 2)]
     assert actual == expected
