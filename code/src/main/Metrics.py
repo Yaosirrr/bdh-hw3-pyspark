@@ -13,7 +13,7 @@ def getPurity(cluster_assignment_and_label):
     @param clusterAssignmentAndLabel RDD in the tuple format
                                      (assigned_cluster_id, class)
     @return
-    :param cluster_assignment_and_label: RDD in the tuple format (assigned_cluster_id, class)
+    :param cluster_assignment_and_label: RDD in the tuple format ((assigned_cluster_id, class), number)
     :return: double
     """
     n = cluster_assignment_and_label.count()

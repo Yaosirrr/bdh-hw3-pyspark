@@ -7,9 +7,6 @@ from typing import Tuple
 from datetime import date
 import sys
 sys.path.append('./')
-
-for pat in sys.path:
-  print(pat)
 from src.main.models import Diagnostic, Medication, LabResult
 from src.main.feature_construction import *
 

@@ -2,10 +2,10 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 from datetime import datetime
 from pyspark.sql.types import StringType, BooleanType, IntegerType, DoubleType
-from nose.tools import with_setup, ok_, eq_, assert_almost_equals, nottest,assert_is
+from nose.tools import with_setup, ok_, eq_, assert_almost_equals, nottest, assert_is
 import sys
-sys.path.append("..")
-from main.loadRddRawData import load_rdd_raw_data
+sys.path.append("./")
+from src.main.loadRddRawData import load_rdd_raw_data
 
 def test_loadrddrawdata():
     numTrueMedication = 31552

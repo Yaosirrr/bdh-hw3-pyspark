@@ -2,12 +2,13 @@ from pyspark import SparkContext
 from pyspark.rdd import RDD
 from pyspark import SparkContext
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import lower 
 from typing import Tuple
 import sys
 sys.path.append('./')
 from src.main.models import Diagnostic, Medication, LabResult
 from src.main.loadRddRawData import load_rdd_raw_data
-from pyspark.sql.functions import lower 
+
 
 #class T2dmPhenotype:
 T1DM_DX = {"250.01", "250.03", "250.11", "250.13", "250.21", "250.23", "250.31", "250.33", "250.41", "250.43",
@@ -107,6 +108,9 @@ def transform(medication, labResult, diagnostic):
         #     .map(lambda x: x[0]) \
         #     .collect()
         
+        '''
+        this spark should be defined or input
+        '''
         labResult = spark.sparkContext.parallelize(labResult.collect())
         print(type(labResult))
 

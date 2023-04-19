@@ -3,6 +3,11 @@ from pyspark.ml.feature import StandardScaler
 from pyspark.ml.clustering import GaussianMixture, KMeans, StreamingKMeans
 from pyspark.mllib.linalg import DenseMatrix, SparseVector, Matrices, Vectors
 from pyspark.mllib.linalg.distributed import RowMatrix
+
+import sys
+sys.path.append('./')
+
+
 from model import student_clustering
 from metric import getPurity
 

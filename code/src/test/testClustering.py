@@ -5,30 +5,13 @@ from pyspark.mllib.linalg.distributed import RowMatrix
 from pyspark.mllib.clustering import KMeans, GaussianMixture
 from pyspark.sql.functions import udf
 from pyspark.sql.types import IntegerType
-import code.src.main.Metrics
 
-
-class Medication:
-    def __init__(self, patientID, date, medicine):
-        self.patientID = patientID
-        self.date = date
-        self.medicine = medicine
-
-
-class LabResult:
-    def __init__(self, patientID, date, resultName, value):
-        self.patientID = patientID
-        self.date = date
-        self.resultName = resultName
-        self.value = value
-
-
-class Diagnostic:
-    def __init__(self, patientID, code, date):
-        self.patientID = patientID
-        self.date = date
-        self.code = code
-
+import sys
+sys.path.append("./")
+from src.main.Metrics import getPurity
+from src.main.models import Diagnostic, Medication, LabResult
+from src.main.feature_construction import *
+from src.main.loadRddRawData import *
 
 def test_clustering(phenotypeLabel, rawFeatures):
     print('phenotypeLabel: ' + phenotypeLabel.count())
@@ -57,13 +40,13 @@ def test_clustering(phenotypeLabel, rawFeatures):
 
     kmeans_cluster_assignment_and_label = features.join(phenotypeLabel).map(lambda x: (kmeans.predict(transform(x[1])), x[2]))
 
-    kmeans_purity = Metrics.getPurity(kmeans_cluster_assignment_and_label)
+    kmeans_purity = getPurity(kmeans_cluster_assignment_and_label)
 
     # train a gmm model from mllib
     gmm = GaussianMixture.train(feature_vectors.cache(), k=3, seed=6250)
     rdd_of_vectors = features.join(phenotypeLabel).map(lambda x: transform(x[1][0]))
     labels = features.join(phenotypeLabel).map(lambda x: transform(x[1][1]))
     gmm_cluster_assignment_and_label = gmm.predict(rdd_of_vectors).zip(labels)
-    gmm_purity = Metrics.getPurity(gmm_cluster_assignment_and_label)
+    gmm_purity = getPurity(gmm_cluster_assignment_and_label)
 
     return kmeans_purity, gmm_purity
