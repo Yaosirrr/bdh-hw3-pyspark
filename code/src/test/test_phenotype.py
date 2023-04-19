@@ -10,12 +10,13 @@ from src.main.models import Diagnostic, Medication, LabResult
 from src.main.phenotype import transform
 from src.main.loadRddRawData import load_rdd_raw_data
 
-global spark
-spark = SparkSession.builder.appName('Feature Construction Test').getOrCreate()
+
 # spark.SparkContext.setLogLevel("ERROR")
 
 @nottest
-def setup_phenotype(spark):
+def setup_phenotype():
+    global spark
+    spark = SparkSession.builder.appName('Feature Construction Test').getOrCreate()
     global patient_features
     patient_features = spark.sparkContext.parallelize([
         (("patient1", "code2"), 49.0),
@@ -23,8 +24,8 @@ def setup_phenotype(spark):
         (("patient1", "code1"), 24.0)
     ])
 
-# @with_setup()
-def test_phenotype(spark):
+@with_setup(setup_phenotype())
+def test_phenotype():
     numTrueCases = 976
     numTrueControl = 948
     numTrueOthers = 3688 - numTrueCases - numTrueControl
@@ -40,5 +41,5 @@ def test_phenotype(spark):
     assert_almost_equals( numTrueControl ,numControl, msg="UNEQUAL in Control_patients, Expected:%s, Actual:%s" %( numTrueControl ,numControl))
     assert_almost_equals( numTrueOthers ,numOthers, msg="UNEQUAL in Others_patients, Expected:%s, Actual:%s" %( numTrueOthers ,numOthers))
 
-test_phenotype(spark)
+# test_phenotype(spark)
 
