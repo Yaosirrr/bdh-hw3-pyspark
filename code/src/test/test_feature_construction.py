@@ -41,7 +41,6 @@ def test_unique_ids():
     res = True
     
     expected = [('patient1', Vectors.sparse(3, [(0, 24.0), (1, 49.0), (2, 19.0)]))]
-
     if temp != expected:
         res = False
     # if len(expected) != len(temp):
@@ -89,199 +88,209 @@ def test_sparse_vectors():
 ####################################################################
 @nottest
 def setup_diags_one(spark):
-    global diags
+    global diags1
     data = [Diagnostic("patient1", "code1", date.today())]
-    diags = spark.sparkContext.parallelize(data)
+    diags1 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_diags_one(spark))
 def test_aggregate_one_event_diagnostic():
-    actual = constructDiagnosticFeatureTuple(diags).collect()
+    actual = constructDiagnosticFeatureTuple(diags1).collect()
     expected = [(('patient1', 'code1'), 1.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Diagnostic: test aggregate one event failed")
 
 @nottest
 def setup_diags_two_different(spark):
-    global diags
+    global diags2
     data = [Diagnostic("patient1", "code1", date.today()),
             Diagnostic("patient1", "code2", date.today())]
-    diags = spark.sparkContext.parallelize(data)
+    diags2 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_diags_two_different(spark))
 def test_aggregate_two_different_events_diagnostic():
-    actual = constructDiagnosticFeatureTuple(diags).collect()
+    actual = constructDiagnosticFeatureTuple(diags2).collect()
     expected = [(('patient1', 'code1'), 1.0),
                 (('patient1', 'code2'), 1.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Diagnostic: test aggregate two different events failed")
 
 @nottest
 def setup_diags_two_same(spark):
-    global diags
+    global diags3
     data = [Diagnostic("patient1", "code1", date.today()),
             Diagnostic("patient1", "code1", date.today())]
-    diags = spark.sparkContext.parallelize(data)
+    diags3 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_diags_two_same(spark))
 def test_aggregate_two_same_events_diagnostic():
-    actual = constructDiagnosticFeatureTuple(diags).collect()
+    actual = constructDiagnosticFeatureTuple(diags3).collect()
     expected = [(('patient1', 'code1'), 2.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Diagnostic: test aggregate two same events failed")
 
 @nottest
 def setup_diags_three(spark):
-    global diags
+    global diags4
     data = [Diagnostic("patient1", "code1", date.today()),
             Diagnostic("patient1", "code1", date.today()),
             Diagnostic("patient1", "code2", date.today())]
-    diags = spark.sparkContext.parallelize(data)
+    diags4 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_diags_three(spark))
 def test_aggregate_three_events_with_duplication_diagnostic():
-    actual = constructDiagnosticFeatureTuple(diags).collect()
+    actual = constructDiagnosticFeatureTuple(diags4).collect()
     expected = [(('patient1', 'code1'), 2.0),
                 (('patient1', 'code2'), 1.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Diagnostic: test aggregate three events failed")
 
 @with_setup(setup_diags_three(spark))
 def test_filter_diagnostic():
-    actual = constructDiagnosticFeatureTuple(diags, {"code2"}).collect()
+    actual = constructDiagnosticFeatureTuple(diags4, {"code2"}).collect()
     expected = [(('patient1', 'code2'), 1.0)]
-    assert actual == expected
+    res = actual == expected
 
-    actual = constructDiagnosticFeatureTuple(diags, {"code1"}).collect()
+    actual = constructDiagnosticFeatureTuple(diags4, {"code1"}).collect()
     expected = [(('patient1', 'code1'), 2.0)]
-    assert actual == expected
+    res = res and (actual == expected)
+    eq_(res, True, "Diagnostic: test filter events failed")
 
 ####################################################################
 @nottest
 def setup_meds_one(spark):
-    global meds
+    global meds1
     data = [Medication("patient1", date.today(), "code1")]
-    meds = spark.sparkContext.parallelize(data)
+    meds1 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_meds_one(spark))
 def test_aggregate_one_event_medication():
-    actual = constructMedicationFeatureTuple(meds).collect()
+    actual = constructMedicationFeatureTuple(meds1).collect()
     expected = [(('patient1', 'code1'), 1.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Medication: test aggregate one event failed")
 
 @nottest
 def setup_meds_two_diff(spark):
-    global meds
+    global meds2
     data = [Medication("patient1", date.today(), "code1"),
             Medication("patient1", date.today(), "code2")]
-    meds = spark.sparkContext.parallelize(data)
+    meds2 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_meds_two_diff(spark))
 def test_aggregate_two_different_events_medication():
-    actual = constructMedicationFeatureTuple(meds).collect()
+    actual = constructMedicationFeatureTuple(meds2).collect()
     expected = [(('patient1', 'code1'), 1.0),
                 (('patient1', 'code2'), 1.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Medication: test aggregate two different events failed")
 
 @nottest
 def setup_meds_two_same(spark):
-    global meds
+    global meds3
     data = [Medication("patient1", date.today(), "code1"),
             Medication("patient1", date.today(), "code1")]
-    meds = spark.sparkContext.parallelize(data)
+    meds3 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_meds_two_same(spark))
 def test_aggregate_two_same_events_medication():
-    actual = constructMedicationFeatureTuple(meds).collect()
+    actual = constructMedicationFeatureTuple(meds3).collect()
     expected = [(('patient1', 'code1'), 2.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Medication: test aggregate two same events failed")
 
 @nottest
 def setup_meds_three(spark):
-    global meds
+    global meds4
     data = [Medication("patient1", date.today(), "code1"),
             Medication("patient1", date.today(), "code1"),
             Medication("patient1", date.today(), "code2")]
-    meds = spark.sparkContext.parallelize(data)
+    meds4 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_meds_three(spark))
 def test_aggregate_three_events_with_duplication_medication():
-    actual = constructMedicationFeatureTuple(meds).collect()
+    actual = constructMedicationFeatureTuple(meds4).collect()
     expected = [(('patient1', 'code1'), 2.0),
                 (('patient1', 'code2'), 1.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Medication: test aggregate three events failed")
 
 @with_setup(setup_meds_three(spark))
 def test_filter_medication():
-    actual = constructMedicationFeatureTuple(meds, {"code2"}).collect()
+    actual = constructMedicationFeatureTuple(meds4, {"code2"}).collect()
     expected = [(('patient1', 'code2'), 1.0)]
-    assert actual == expected
+    res = actual == expected
 
-    actual = constructMedicationFeatureTuple(meds, {"code1"}).collect()
+    actual = constructMedicationFeatureTuple(meds4, {"code1"}).collect()
     expected = [(('patient1', 'code1'), 2.0)]
-    assert actual == expected
+    res = res and (actual == expected)
+    eq_(res, True, "Medication: test filter events failed")
 
 ####################################################################
 @nottest
 def setup_labs_one(spark):
-    global labs
+    global labs1
     data = [LabResult("patient1", date.today(), "code1", 42.0)]
-    labs = spark.sparkContext.parallelize(data)
+    labs1 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_labs_one(spark))
 def test_aggregate_one_event_lab():
-    actual = constructLabFeatureTuple(labs).collect()
+    actual = constructLabFeatureTuple(labs1).collect()
     expected = [(('patient1', 'code1'), 42.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Labs: test aggregate one event failed")
 
 @nottest
 def setup_labs_two_diff(spark):
-    global labs
+    global labs2
     data = [LabResult("patient1", date.today(), "code1", 42.0),
             LabResult("patient1", date.today(), "code2", 24.0)]
-    labs = spark.sparkContext.parallelize(data)
+    labs2 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_labs_two_diff(spark))
 def test_aggregate_two_different_events_lab():
-    actual = constructLabFeatureTuple(labs).collect()
+    actual = constructLabFeatureTuple(labs2).collect()
     expected = [(('patient1', 'code1'), 42.0),
                 (('patient1', 'code2'), 24.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Labs: test aggregate two different events failed")
 
 @nottest
 def setup_labs_two_same(spark):
-    global labs
+    global labs3
     data = [LabResult("patient1", date.today(), "code1", 42.0),
             LabResult("patient1", date.today(), "code1", 24.0)]
-    labs = spark.sparkContext.parallelize(data)
+    labs3 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_labs_two_same(spark))
 def test_aggregate_two_same_events_lab():
-    actual = constructLabFeatureTuple(labs).collect()
+    actual = constructLabFeatureTuple(labs3).collect()
     expected = [(('patient1', 'code1'), 66.0 / 2)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Labs: test aggregate two same events failed")
 
 @nottest
 def setup_labs_three(spark):
-    global labs
+    global labs4
     data = [LabResult("patient1", date.today(), "code1", 42.0),
             LabResult("patient1", date.today(), "code1", 24.0),
             LabResult("patient1", date.today(), "code2", 7475.0)]
-    labs = spark.sparkContext.parallelize(data)
+    labs4 = spark.sparkContext.parallelize(data)
 
 @with_setup(setup_labs_three(spark))
 def test_aggregate_three_events_with_duplication_lab():
-    actual = constructLabFeatureTuple(labs).collect()
+    actual = constructLabFeatureTuple(labs4).collect()
     expected = [(('patient1', 'code1'), 66.0 / 2),
                 (('patient1', 'code2'), 7475.0)]
-    assert actual == expected
+    res= actual == expected
+    eq_(res, True, "Labs: test aggregate three events failed")
 
 @with_setup(setup_labs_three(spark))
-def test_filter_lab(spark):
-    data = [LabResult("patient1", date.today(), "code1", 42.0),
-            LabResult("patient1", date.today(), "code1", 24.0),
-            LabResult("patient1", date.today(), "code2", 7475.0)]
-    labs = spark.sparkContext.parallelize(data)
-
-    actual = constructLabFeatureTuple(labs, {"code2"}).collect()
+def test_filter_lab():
+    actual = constructLabFeatureTuple(labs4, {"code2"}).collect()
     expected = [(('patient1', 'code2'), 7475.0)]
-    assert actual == expected
+    res = actual == expected
 
-    actual = constructLabFeatureTuple(labs, {"code1"}).collect()
+    actual = constructLabFeatureTuple(labs4, {"code1"}).collect()
     expected = [(('patient1', 'code1'), 66.0 / 2)]
-    assert actual == expected
+    res = res and (actual == expected)
+    eq_(res, True, "Labs: test filter events failed")
