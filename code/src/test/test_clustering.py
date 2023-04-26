@@ -30,5 +30,5 @@ def test_phenotyping_with_your_data_loader():
     # Run student solution to check KMeans, GaussianMixture if they can run properly
     kMeansPurity, gaussianMixturePurity = test_clustering(phenotypeLabel, rawFeatures)
 
-    print(kMeansPurity)
-    print(gaussianMixturePurity)
+    print(f"Purity of kMeans is: {kMeansPurity:.5f}")
+    print(f"Purity of GMM is: {gaussianMixturePurity:.5f}")
