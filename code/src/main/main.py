@@ -3,7 +3,7 @@ from pyspark.sql import SparkSession
 from src.main.phenotype import *
 from src.main.loadRddRawData import *
 from src.main.feature_construction import *
-from src.main.testClustering import *
+from src.main.clustering import *
 
 
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     rawFeatures = construct(sc, feature_tuples)
 
-    kMeansPurity, gaussianMixturePurity = test_clustering(phenotypeLabel, rawFeatures)
+    kMeansPurity, gaussianMixturePurity = clustering(phenotypeLabel, rawFeatures)
     print(f"[All feature] purity of kMeans is: $kMeansPurity%.5f")
     print(f"[All feature] purity of GMM is: $gaussianMixturePurity%.5f")
     
@@ -61,7 +61,6 @@ if __name__ == "__main__":
 
     filteredRawFeatures = construct(sc, filteredFeatureTuples)
 
-    kMeansPurity2, gaussianMixturePurity2 = test_clustering(phenotypeLabel, filteredRawFeatures)
+    kMeansPurity2, gaussianMixturePurity2 = clustering(phenotypeLabel, filteredRawFeatures)
     print(f"[Filtered feature] purity of kMeans is: $kMeansPurity2%.5f")
     print(f"[Filtered feature] purity of GMM is: $gaussianMixturePurity2%.5f")
-  }

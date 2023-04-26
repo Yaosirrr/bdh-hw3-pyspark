@@ -10,8 +10,7 @@ sys.path.append('./')
 
 
 from src.main.feature_construction import construct
-import src.main.testClustering
-from src.main.Metrics import getPurity
+from src.main.clustering import *
 
 spark = SparkSession.builder.appName('Test Clustering').getOrCreate()
 
@@ -28,7 +27,7 @@ def test_phenotyping_with_your_data_loader():
     rawFeatures = construct(featureTuples)
 
     # Run student solution to check KMeans, GaussianMixture if they can run properly
-    kMeansPurity, gaussianMixturePurity = src.main.testClustering.test_clustering(phenotypeLabel, rawFeatures)
+    kMeansPurity, gaussianMixturePurity = clustering(phenotypeLabel, rawFeatures)
 
     print(f"Purity of kMeans is: {kMeansPurity:.5f}")
     print(f"Purity of GMM is: {gaussianMixturePurity:.5f}")

@@ -8,12 +8,12 @@ from pyspark.sql.types import IntegerType
 
 import sys
 sys.path.append("./")
-from src.main.Metrics import getPurity
+from src.main.metrics import getPurity
 from src.main.models import Diagnostic, Medication, LabResult
 from src.main.feature_construction import *
 from src.main.loadRddRawData import *
 
-def test_clustering(phenotypeLabel, rawFeatures):
+def clustering(phenotypeLabel, rawFeatures):
     print('phenotypeLabel: ', phenotypeLabel.count())
     standardizer = StandardScaler(True, True)
     scaler = standardizer.fit(rawFeatures.map(lambda x: x[1]))

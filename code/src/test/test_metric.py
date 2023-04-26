@@ -5,7 +5,7 @@ from nose.tools import with_setup, eq_, ok_,nottest, assert_almost_equals
 
 import sys
 sys.path.append("./")
-from src.main.Metrics import getPurity
+from src.main.metrics import getPurity
 
 
 spark = SparkSession.builder.appName("TestMetrics").getOrCreate()
