@@ -14,13 +14,13 @@ from src.main.feature_construction import *
 from src.main.loadRddRawData import *
 
 def test_clustering(phenotypeLabel, rawFeatures):
-    print('phenotypeLabel: ' + phenotypeLabel.count())
+    print('phenotypeLabel: ', phenotypeLabel.count())
     standardizer = StandardScaler(True, True)
     scaler = standardizer.fit(rawFeatures.map(lambda x: x[1]))
     features = rawFeatures.map(lambda x: (x[0], scaler.transform(Vectors.dense(x[1].toArray()))))
     print('features' + features.count())
     raw_feature_vectors = features.map(lambda x: x[1]).cache()
-    print('raw_feature_vectors: ' + raw_feature_vectors)
+    print('raw_feature_vectors: ', raw_feature_vectors)
 
     # reduce dimension
     mat = RowMatrix(raw_feature_vectors.map(Matrices.dense))
